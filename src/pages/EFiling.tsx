@@ -101,19 +101,19 @@ export default function EFiling() {
       {/* Case Search */}
       {activeTab === 'search' && (
         <div className="space-y-4">
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5">
             <div className="grid md:grid-cols-4 gap-3">
               <div className="md:col-span-2">
                 <label className="text-sm text-slate-400 block mb-1">Party Name or Case Number</label>
                 <input value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && handleSearch()}
                   placeholder="e.g., Smith v. City of Oxford or 3:26-cv-00142"
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-indigo-500" />
+                  className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-indigo-500" />
               </div>
               <div>
                 <label className="text-sm text-slate-400 block mb-1">Court</label>
                 <select value={selectedCourt} onChange={e => setSelectedCourt(e.target.value)}
-                  className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm">
+                  className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm">
                   {COURTS.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
                 </select>
               </div>
@@ -129,11 +129,11 @@ export default function EFiling() {
           {searched && (
             <div className="space-y-3">
               {searchResults.length === 0 ? (
-                <div className="bg-slate-800 border border-slate-700 rounded-xl p-8 text-center text-slate-500 text-sm">
+                <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-8 text-center text-slate-500 text-sm">
                   No results found. Try a different search or court.
                 </div>
               ) : searchResults.map(r => (
-                <div key={r.id} className="bg-slate-800 border border-slate-700 rounded-xl p-4 hover:border-indigo-500/50 transition-colors">
+                <div key={r.id} className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 hover:border-indigo-500/50 transition-colors">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="text-indigo-400 font-mono text-sm font-bold">{r.caseNumber}</div>
@@ -168,7 +168,7 @@ export default function EFiling() {
       {/* Docket Viewer */}
       {activeTab === 'docket' && (
         <div className="space-y-4">
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4">
             <div className="flex items-center justify-between mb-4">
               <div>
                 <div className="text-indigo-400 font-mono text-sm font-bold">3:26-cv-00142-MPM</div>
@@ -179,7 +179,7 @@ export default function EFiling() {
             </div>
           </div>
 
-          <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl overflow-hidden">
             <div className="px-4 py-3 border-b border-slate-700 flex items-center justify-between">
               <span className="text-white font-medium text-sm">Docket Entries ({SAMPLE_DOCKET.length})</span>
               <Filter size={14} className="text-slate-500" />
@@ -223,7 +223,7 @@ export default function EFiling() {
             ))}
           </div>
           <div className="lg:col-span-2 space-y-4">
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+            <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5">
               <h3 className="text-xl font-bold text-white mb-4">{selectedDocType.type}</h3>
               <div className="space-y-4">
                 <div className="bg-slate-700/50 rounded-lg p-4">
@@ -254,7 +254,7 @@ export default function EFiling() {
       {activeTab === 'directory' && (
         <div className="grid md:grid-cols-2 gap-4">
           {COURTS.map(c => (
-            <div key={c.code} className="bg-slate-800 border border-slate-700 rounded-xl p-4 hover:border-indigo-500/30 transition-colors">
+            <div key={c.code} className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 hover:border-indigo-500/30 transition-colors">
               <div className="flex items-start justify-between">
                 <div>
                   <div className="text-white font-medium text-sm">{c.name}</div>

@@ -149,11 +149,11 @@ Format the content in HTML with proper heading tags.`,
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Generator */}
         <div className="space-y-4">
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5 space-y-4">
             <div>
               <label className="text-sm text-slate-400 block mb-1">Practice Area</label>
               <select value={practiceArea} onChange={e => setPracticeArea(e.target.value)}
-                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm">
+                className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm">
                 {PRACTICE_AREAS.map(p => <option key={p}>{p}</option>)}
               </select>
             </div>
@@ -161,12 +161,12 @@ Format the content in HTML with proper heading tags.`,
               <label className="text-sm text-slate-400 block mb-1">Location</label>
               <input value={location} onChange={e => setLocation(e.target.value)}
                 placeholder="e.g., Lafayette County, Mississippi"
-                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-500" />
+                className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-green-500" />
             </div>
             <div>
               <label className="text-sm text-slate-400 block mb-1">Tone</label>
               <select value={tone} onChange={e => setTone(e.target.value)}
-                className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm">
+                className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm">
                 <option value="professional">Professional & Authoritative</option>
                 <option value="empathetic">Empathetic & Approachable</option>
                 <option value="aggressive">Aggressive & Confident</option>
@@ -179,7 +179,7 @@ Format the content in HTML with proper heading tags.`,
                 <input value={newKeyword} onChange={e => setNewKeyword(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && addKeyword()}
                   placeholder="Add keyword..."
-                  className="flex-1 bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-green-500" />
+                  className="flex-1 bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-green-500" />
                 <button onClick={addKeyword} className="bg-slate-700 hover:bg-slate-600 text-slate-300 px-3 rounded-lg"><Plus size={16} /></button>
               </div>
               <div className="flex flex-wrap gap-1.5 mt-2">
@@ -191,7 +191,7 @@ Format the content in HTML with proper heading tags.`,
               </div>
             </div>
             <button onClick={generatePage} disabled={generating}
-              className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition-colors">
+              className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-40 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-colors">
               {generating ? <><Loader2 className="animate-spin" size={18} /> Generating...</> : <><Sparkles size={18} /> Generate Page</>}
             </button>
           </div>
@@ -211,14 +211,14 @@ Format the content in HTML with proper heading tags.`,
         {/* Generated Pages List */}
         <div className="lg:col-span-2 space-y-4">
           {pages.length === 0 && (
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-12 text-center">
+            <div className="bg-slate-800/40 border border-slate-700/40 rounded-2xl p-12 text-center">
               <Globe2 className="mx-auto text-slate-600 mb-3" size={48} />
               <p className="text-slate-500">Generated pages will appear here</p>
               <p className="text-slate-600 text-xs mt-1">Each page is SEO-optimized and ready to publish</p>
             </div>
           )}
           {pages.map(page => (
-            <div key={page.id} className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+            <div key={page.id} className="bg-slate-800/60 border border-slate-700/50 rounded-2xl overflow-hidden">
               <div className="p-4 space-y-3">
                 <div className="flex items-start justify-between gap-3">
                   <div>

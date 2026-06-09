@@ -94,7 +94,7 @@ export default function DeadlinesAndSol() {
         </div>
       </div>
 
-      <div className="flex gap-1 bg-slate-800 border border-slate-700 rounded-xl p-1">
+      <div className="flex gap-1 bg-slate-800/60 border border-slate-700/50 rounded-2xl p-1">
         <button onClick={() => setTab('deadlines')} className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-colors ${tab === 'deadlines' ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-700'}`}>
           <Calendar size={16} /> Deadline Tracker ({deadlines.filter(d => !d.is_completed).length} active)
         </button>
@@ -112,22 +112,22 @@ export default function DeadlinesAndSol() {
             </button>
           </div>
           {showForm && (
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-3">
+            <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5 space-y-3">
               <div className="grid md:grid-cols-2 gap-3">
-                <input value={form.title} onChange={e => setForm(f => ({...f, title: e.target.value}))} placeholder="Deadline title" className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
-                <input value={form.case_name} onChange={e => setForm(f => ({...f, case_name: e.target.value}))} placeholder="Case name" className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
+                <input value={form.title} onChange={e => setForm(f => ({...f, title: e.target.value}))} placeholder="Deadline title" className="bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm" />
+                <input value={form.case_name} onChange={e => setForm(f => ({...f, case_name: e.target.value}))} placeholder="Case name" className="bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm" />
               </div>
               <div className="grid md:grid-cols-3 gap-3">
-                <select value={form.deadline_type} onChange={e => setForm(f => ({...f, deadline_type: e.target.value}))} className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm">
+                <select value={form.deadline_type} onChange={e => setForm(f => ({...f, deadline_type: e.target.value}))} className="bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm">
                   {DEADLINE_TYPES.map(t => <option key={t}>{t}</option>)}
                 </select>
-                <input type="date" value={form.due_date} onChange={e => setForm(f => ({...f, due_date: e.target.value}))} className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
+                <input type="date" value={form.due_date} onChange={e => setForm(f => ({...f, due_date: e.target.value}))} className="bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm" />
                 <label className="flex items-center gap-2 text-slate-400 text-sm">
                   <input type="checkbox" checked={form.is_critical} onChange={e => setForm(f => ({...f, is_critical: e.target.checked}))} className="rounded" />
                   Critical deadline
                 </label>
               </div>
-              <input value={form.description} onChange={e => setForm(f => ({...f, description: e.target.value}))} placeholder="Notes..." className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
+              <input value={form.description} onChange={e => setForm(f => ({...f, description: e.target.value}))} placeholder="Notes..." className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm" />
               <button onClick={addDeadline} disabled={!form.title || !form.due_date} className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white px-6 py-2 rounded-lg text-sm font-medium">Add</button>
             </div>
           )}
@@ -158,7 +158,7 @@ export default function DeadlinesAndSol() {
                 </div>
               );
             })}
-            {deadlines.length === 0 && <div className="bg-slate-800 border border-slate-700 rounded-xl p-10 text-center text-slate-500">No deadlines yet. Add one above or calculate a SOL.</div>}
+            {deadlines.length === 0 && <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-10 text-center text-slate-500">No deadlines yet. Add one above or calculate a SOL.</div>}
           </div>
         </div>
       )}
@@ -167,14 +167,14 @@ export default function DeadlinesAndSol() {
       {tab === 'sol' && (
         <div className="grid lg:grid-cols-2 gap-6">
           <div className="space-y-4">
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-5 space-y-4">
-              <div><label className="text-sm text-slate-400 block mb-1"><MapPin size={12} className="inline mr-1" />State</label><select value={selectedState} onChange={e => { setSelectedState(e.target.value); setCalculated(false); }} className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm">{ALL_SOL.map(s => <option key={s.state}>{s.state}</option>)}</select></div>
-              <div><label className="text-sm text-slate-400 block mb-1"><Scale size={12} className="inline mr-1" />Claim Type</label><select value={claimType} onChange={e => { setClaimType(e.target.value); setCalculated(false); }} className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm">{(stateData?.claims.map(c => c.type) || []).map(t => <option key={t}>{t}</option>)}</select></div>
-              <div><label className="text-sm text-slate-400 block mb-1"><Calendar size={12} className="inline mr-1" />Date of Incident</label><input type="date" value={incidentDate} onChange={e => { setIncidentDate(e.target.value); setCalculated(false); }} className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" /></div>
+            <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5 space-y-4">
+              <div><label className="text-sm text-slate-400 block mb-1"><MapPin size={12} className="inline mr-1" />State</label><select value={selectedState} onChange={e => { setSelectedState(e.target.value); setCalculated(false); }} className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm">{ALL_SOL.map(s => <option key={s.state}>{s.state}</option>)}</select></div>
+              <div><label className="text-sm text-slate-400 block mb-1"><Scale size={12} className="inline mr-1" />Claim Type</label><select value={claimType} onChange={e => { setClaimType(e.target.value); setCalculated(false); }} className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm">{(stateData?.claims.map(c => c.type) || []).map(t => <option key={t}>{t}</option>)}</select></div>
+              <div><label className="text-sm text-slate-400 block mb-1"><Calendar size={12} className="inline mr-1" />Date of Incident</label><input type="date" value={incidentDate} onChange={e => { setIncidentDate(e.target.value); setCalculated(false); }} className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm" /></div>
               <button onClick={() => setCalculated(true)} disabled={!incidentDate || !claimData} className="w-full bg-orange-600 hover:bg-orange-700 disabled:opacity-50 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2"><Calculator size={18} /> Calculate Deadline</button>
             </div>
             {stateData && (
-              <div className="bg-slate-800 border border-slate-700 rounded-xl p-4">
+              <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4">
                 <h3 className="text-white font-semibold text-sm mb-3">{stateData.state} — All Periods</h3>
                 {stateData.claims.map((c, i) => (
                   <div key={i} className={`flex justify-between py-1.5 border-b border-slate-700/50 last:border-0 ${c.type === claimType ? 'bg-orange-500/10 -mx-2 px-2 rounded' : ''}`}>
@@ -187,7 +187,7 @@ export default function DeadlinesAndSol() {
           </div>
           <div className="space-y-4">
             {!calculated ? (
-              <div className="bg-slate-800 border border-slate-700 rounded-xl p-12 text-center"><Clock className="mx-auto text-slate-600 mb-3" size={48} /><p className="text-slate-500">Enter details and calculate</p></div>
+              <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-12 text-center"><Clock className="mx-auto text-slate-600 mb-3" size={48} /><p className="text-slate-500">Enter details and calculate</p></div>
             ) : deadline && daysRemaining !== null && (
               <>
                 <div className={`rounded-2xl p-6 border-2 ${daysRemaining < 0 ? 'bg-red-500/10 border-red-500/50' : daysRemaining < 30 ? 'bg-red-500/10 border-red-500/40' : daysRemaining < 90 ? 'bg-yellow-500/10 border-yellow-500/40' : 'bg-emerald-500/10 border-emerald-500/40'}`}>
@@ -204,7 +204,7 @@ export default function DeadlinesAndSol() {
                   </div>
                 </div>
                 {claimData && (
-                  <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 space-y-2">
+                  <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-4 space-y-2">
                     <div className="text-blue-400 font-semibold text-sm">📖 Legal Authority</div>
                     <div className="text-slate-300 text-sm">{claimData.notes}</div>
                     {claimData.tolling && <div className="bg-yellow-500/10 border border-yellow-500/20 rounded-lg p-3"><div className="text-yellow-400 text-xs font-semibold mb-1">⚠️ Tolling</div><div className="text-slate-300 text-xs">{claimData.tolling}</div></div>}

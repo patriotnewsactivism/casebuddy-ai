@@ -140,7 +140,7 @@ Respond JSON: {"ai_prep_notes":"overview","direct_questions":["Q"],"cross_questi
 
   const diffColor: Record<string, string> = { Learn: 'bg-green-600', Practice: 'bg-yellow-600', Trial: 'bg-red-600' };
   const Section = ({ id, title, color, children }: any) => (
-    <div className="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden">
+    <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl overflow-hidden">
       <button onClick={() => toggle(id)} className="w-full flex items-center justify-between px-5 py-4 hover:bg-slate-750">
         <div className={`font-semibold text-sm ${color}`}>{title}</div>
         {expanded.includes(id) ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
@@ -165,7 +165,7 @@ Respond JSON: {"ai_prep_notes":"overview","direct_questions":["Q"],"cross_questi
         </div>
       </div>
 
-      <div className="flex gap-1 bg-slate-800 border border-slate-700 rounded-xl p-1">
+      <div className="flex gap-1 bg-slate-800/60 border border-slate-700/50 rounded-2xl p-1">
         {TABS.map(t => (
           <button key={t.id} onClick={() => setTab(t.id)}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-medium transition-colors ${
@@ -180,7 +180,7 @@ Respond JSON: {"ai_prep_notes":"overview","direct_questions":["Q"],"cross_questi
       {tab === 'coach' && (
         <>
           {showConfig && (
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 space-y-5">
+            <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-6 space-y-5">
               <div className="text-white font-semibold">Session Configuration</div>
               <div className="grid md:grid-cols-2 gap-4">
                 <div>
@@ -198,7 +198,7 @@ Respond JSON: {"ai_prep_notes":"overview","direct_questions":["Q"],"cross_questi
                   <div>
                     <label className="text-sm text-slate-400 block mb-2">Mode</label>
                     <select value={config.mode} onChange={e => setConfig(c => ({ ...c, mode: e.target.value }))}
-                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none">
+                      className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none">
                       {MODES.map(m => <option key={m}>{m}</option>)}
                     </select>
                   </div>
@@ -216,7 +216,7 @@ Respond JSON: {"ai_prep_notes":"overview","direct_questions":["Q"],"cross_questi
                   <div>
                     <label className="text-sm text-slate-400 block mb-2">Case Facts</label>
                     <textarea value={config.case_facts} onChange={e => setConfig(c => ({ ...c, case_facts: e.target.value }))} rows={3} placeholder="Brief case summary..."
-                      className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none resize-none" />
+                      className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none resize-none" />
                   </div>
                 </div>
               </div>
@@ -226,7 +226,7 @@ Respond JSON: {"ai_prep_notes":"overview","direct_questions":["Q"],"cross_questi
             </div>
           )}
           {started && (
-            <div className="bg-slate-800 border border-slate-700 rounded-xl flex flex-col h-[600px]">
+            <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl flex flex-col h-[600px]">
               <div className="flex items-center justify-between px-4 py-3 border-b border-slate-700">
                 <div className="flex items-center gap-3">
                   <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse" />
@@ -241,7 +241,7 @@ Respond JSON: {"ai_prep_notes":"overview","direct_questions":["Q"],"cross_questi
                 {messages.length === 0 && <div className="text-center text-slate-500 mt-8"><Swords className="mx-auto mb-3 opacity-30" size={40} /><div>Session ready. Speak or type your first question.</div></div>}
                 {messages.map((m, i) => (
                   <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-[80%] rounded-xl px-4 py-3 text-sm leading-relaxed ${m.role === 'user' ? 'bg-blue-600 text-white' : 'bg-slate-700 text-slate-100'}`}>
+                    <div className={`max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed prose-chat ${m.role === 'user' ? 'bg-blue-600 text-white rounded-br-sm' : 'bg-slate-700/80 border border-slate-600/40 text-slate-100 rounded-bl-sm'}`}>
                       <div className="text-xs opacity-60 mb-1">{m.role === 'user' ? 'You (Attorney)' : ROLES.find(r => r.id === config.role)?.label}</div>
                       {m.content}
                     </div>
@@ -267,25 +267,25 @@ Respond JSON: {"ai_prep_notes":"overview","direct_questions":["Q"],"cross_questi
       {/* ===== WITNESS TAB ===== */}
       {tab === 'witness' && (
         <div className="grid lg:grid-cols-2 gap-6">
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 space-y-4">
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-6 space-y-4">
             <div className="grid grid-cols-2 gap-3">
-              <div><label className="text-xs text-slate-400 block mb-1">Witness Name</label><input value={witnessForm.name} onChange={e => setWitnessForm(f => ({...f, name: e.target.value}))} placeholder="Full name" className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-cyan-500" /></div>
-              <div><label className="text-xs text-slate-400 block mb-1">Occupation</label><input value={witnessForm.occupation} onChange={e => setWitnessForm(f => ({...f, occupation: e.target.value}))} placeholder="Job title" className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none" /></div>
+              <div><label className="text-xs text-slate-400 block mb-1">Witness Name</label><input value={witnessForm.name} onChange={e => setWitnessForm(f => ({...f, name: e.target.value}))} placeholder="Full name" className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500" /></div>
+              <div><label className="text-xs text-slate-400 block mb-1">Occupation</label><input value={witnessForm.occupation} onChange={e => setWitnessForm(f => ({...f, occupation: e.target.value}))} placeholder="Job title" className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none" /></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
-              <div><label className="text-xs text-slate-400 block mb-1">Type</label><select value={witnessForm.witness_type} onChange={e => setWitnessForm(f => ({...f, witness_type: e.target.value as any}))} className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm"><option value="fact">Fact Witness</option><option value="expert">Expert Witness</option><option value="character">Character Witness</option></select></div>
-              <div><label className="text-xs text-slate-400 block mb-1">Side</label><select value={witnessForm.side} onChange={e => setWitnessForm(f => ({...f, side: e.target.value as any}))} className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm"><option value="ours">Our Witness</option><option value="theirs">Their Witness</option></select></div>
+              <div><label className="text-xs text-slate-400 block mb-1">Type</label><select value={witnessForm.witness_type} onChange={e => setWitnessForm(f => ({...f, witness_type: e.target.value as any}))} className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm"><option value="fact">Fact Witness</option><option value="expert">Expert Witness</option><option value="character">Character Witness</option></select></div>
+              <div><label className="text-xs text-slate-400 block mb-1">Side</label><select value={witnessForm.side} onChange={e => setWitnessForm(f => ({...f, side: e.target.value as any}))} className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm"><option value="ours">Our Witness</option><option value="theirs">Their Witness</option></select></div>
             </div>
-            <div><label className="text-xs text-slate-400 block mb-1">Expected Testimony</label><textarea value={witnessForm.expected_testimony} onChange={e => setWitnessForm(f => ({...f, expected_testimony: e.target.value}))} rows={4} placeholder="What will this witness say?" className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm resize-none" /></div>
-            <div><label className="text-xs text-slate-400 block mb-1">Prior Statements</label><textarea value={witnessForm.prior_statements} onChange={e => setWitnessForm(f => ({...f, prior_statements: e.target.value}))} rows={2} placeholder="Deposition excerpts, inconsistencies..." className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm resize-none" /></div>
-            <div><label className="text-xs text-slate-400 block mb-1">Vulnerabilities</label><textarea value={witnessForm.vulnerabilities} onChange={e => setWitnessForm(f => ({...f, vulnerabilities: e.target.value}))} rows={2} placeholder="Bias, prior convictions..." className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm resize-none" /></div>
+            <div><label className="text-xs text-slate-400 block mb-1">Expected Testimony</label><textarea value={witnessForm.expected_testimony} onChange={e => setWitnessForm(f => ({...f, expected_testimony: e.target.value}))} rows={4} placeholder="What will this witness say?" className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm resize-none" /></div>
+            <div><label className="text-xs text-slate-400 block mb-1">Prior Statements</label><textarea value={witnessForm.prior_statements} onChange={e => setWitnessForm(f => ({...f, prior_statements: e.target.value}))} rows={2} placeholder="Deposition excerpts, inconsistencies..." className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm resize-none" /></div>
+            <div><label className="text-xs text-slate-400 block mb-1">Vulnerabilities</label><textarea value={witnessForm.vulnerabilities} onChange={e => setWitnessForm(f => ({...f, vulnerabilities: e.target.value}))} rows={2} placeholder="Bias, prior convictions..." className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm resize-none" /></div>
             <button onClick={generateWitness} disabled={witnessLoading || !witnessForm.name || !witnessForm.expected_testimony}
               className="w-full bg-cyan-600 hover:bg-cyan-700 disabled:opacity-50 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2">
               {witnessLoading ? <><Loader2 className="animate-spin" size={18} />Generating...</> : <><Brain size={18} />Generate Witness Prep</>}
             </button>
           </div>
           <div className="space-y-3">
-            {!witnessResult && !witnessLoading && <div className="bg-slate-800 border border-slate-700 rounded-xl p-10 text-center text-slate-500"><Users className="mx-auto mb-3 opacity-30" size={40} /><div>Fill in witness details</div></div>}
+            {!witnessResult && !witnessLoading && <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-10 text-center text-slate-500"><Users className="mx-auto mb-3 opacity-30" size={40} /><div>Fill in witness details</div></div>}
             {witnessResult && (
               <>
                 {witnessResult.ai_prep_notes && <div className="bg-slate-800 border border-cyan-500/30 rounded-xl p-4"><div className="text-cyan-400 font-semibold text-sm mb-2">Strategic Overview</div><div className="text-slate-300 text-sm leading-relaxed">{witnessResult.ai_prep_notes}</div></div>}
@@ -306,17 +306,17 @@ Respond JSON: {"ai_prep_notes":"overview","direct_questions":["Q"],"cross_questi
       {/* ===== JURY TAB ===== */}
       {tab === 'jury' && (
         <div className="space-y-6">
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5">
             <div className="grid md:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm text-slate-400 block mb-1">Case Type</label>
-                <select value={caseType} onChange={e => setCaseType(e.target.value)} className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm">
+                <select value={caseType} onChange={e => setCaseType(e.target.value)} className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm">
                   {['Civil Rights', 'Personal Injury', 'Police Misconduct', 'Employment', 'Medical Malpractice', 'Contract Dispute', 'Criminal Defense'].map(t => <option key={t}>{t}</option>)}
                 </select>
               </div>
               <div>
                 <label className="text-sm text-slate-400 block mb-1">Case Summary</label>
-                <input value={caseSummaryJury} onChange={e => setCaseSummaryJury(e.target.value)} placeholder="Brief summary..." className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm" />
+                <input value={caseSummaryJury} onChange={e => setCaseSummaryJury(e.target.value)} placeholder="Brief summary..." className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm" />
               </div>
               <div className="flex items-end">
                 <button onClick={simulateJury} disabled={simulating} className="w-full bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-white py-2.5 rounded-lg font-semibold flex items-center justify-center gap-2">
@@ -347,7 +347,7 @@ Respond JSON: {"ai_prep_notes":"overview","direct_questions":["Q"],"cross_questi
               </div>
             </>
           )}
-          {!jurySimResult && !simulating && <div className="bg-slate-800 border border-slate-700 rounded-xl p-12 text-center text-slate-500"><BarChart2 className="mx-auto mb-3 opacity-30" size={48} /><div>Configure and run a jury simulation</div></div>}
+          {!jurySimResult && !simulating && <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-12 text-center text-slate-500"><BarChart2 className="mx-auto mb-3 opacity-30" size={48} /><div>Configure and run a jury simulation</div></div>}
         </div>
       )}
     </div>

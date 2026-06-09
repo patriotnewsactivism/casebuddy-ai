@@ -108,7 +108,7 @@ export default function LegalSecretary() {
       {/* Live Demo */}
       {activeTab === 'demo' && (
         <div className="grid lg:grid-cols-2 gap-6">
-          <div className="bg-slate-800 border border-slate-700 rounded-2xl overflow-hidden flex flex-col" style={{ height: '520px' }}>
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl overflow-hidden flex flex-col" style={{ height: '520px' }}>
             <div className="px-4 py-3 border-b border-slate-700 flex items-center gap-3" style={{ background: config.primaryColor }}>
               <div className="w-8 h-8 bg-white/20 rounded-full flex items-center justify-center">
                 <MessageSquare size={16} className="text-white" />
@@ -156,7 +156,7 @@ export default function LegalSecretary() {
           </div>
 
           <div className="space-y-4">
-            <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+            <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5">
               <h3 className="text-white font-semibold mb-3">How It Works</h3>
               <div className="space-y-3">
                 {[
@@ -189,7 +189,7 @@ export default function LegalSecretary() {
       {activeTab === 'leads' && (
         <div className="space-y-4">
           {leads.map((lead, i) => (
-            <div key={i} className="bg-slate-800 border border-slate-700 rounded-xl p-5 hover:border-cyan-500/30 transition-colors">
+            <div key={i} className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5 hover:border-cyan-500/30 transition-colors">
               <div className="flex items-start justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
@@ -217,11 +217,11 @@ export default function LegalSecretary() {
 
       {/* Configuration */}
       {activeTab === 'config' && (
-        <div className="bg-slate-800 border border-slate-700 rounded-xl p-6 space-y-5 max-w-2xl">
+        <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-6 space-y-5 max-w-2xl">
           <div>
             <label className="text-sm text-slate-400 block mb-1">Firm Name</label>
             <input value={config.firmName} onChange={e => setConfig(prev => ({ ...prev, firmName: e.target.value }))}
-              className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-cyan-500" />
+              className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500" />
           </div>
           <div>
             <label className="text-sm text-slate-400 block mb-1">Brand Color</label>
@@ -229,24 +229,24 @@ export default function LegalSecretary() {
               <input type="color" value={config.primaryColor} onChange={e => setConfig(prev => ({ ...prev, primaryColor: e.target.value }))}
                 className="w-10 h-10 rounded cursor-pointer" />
               <input value={config.primaryColor} onChange={e => setConfig(prev => ({ ...prev, primaryColor: e.target.value }))}
-                className="bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm w-32" />
+                className="bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm w-32" />
             </div>
           </div>
           <div>
             <label className="text-sm text-slate-400 block mb-1">Greeting Message</label>
             <textarea value={config.greeting} onChange={e => setConfig(prev => ({ ...prev, greeting: e.target.value }))}
-              rows={2} className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-cyan-500 resize-none" />
+              rows={2} className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500 resize-none" />
           </div>
           <div>
             <label className="text-sm text-slate-400 block mb-1">Practice Areas (comma-separated)</label>
             <input value={config.practiceAreas} onChange={e => setConfig(prev => ({ ...prev, practiceAreas: e.target.value }))}
-              className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-cyan-500" />
+              className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500" />
           </div>
           <div>
             <label className="text-sm text-slate-400 block mb-1">Booking URL (optional)</label>
             <input value={config.bookingUrl} onChange={e => setConfig(prev => ({ ...prev, bookingUrl: e.target.value }))}
               placeholder="https://calendly.com/yourfirm"
-              className="w-full bg-slate-700 border border-slate-600 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-cyan-500" />
+              className="w-full bg-slate-700/60 border border-slate-600/50 rounded-xl px-3 py-2.5 text-white text-sm focus:outline-none focus:border-cyan-500" />
           </div>
           <div className="flex gap-6">
             <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
@@ -264,7 +264,7 @@ export default function LegalSecretary() {
       {/* Embed Code */}
       {activeTab === 'embed' && (
         <div className="space-y-4 max-w-3xl">
-          <div className="bg-slate-800 border border-slate-700 rounded-xl p-5">
+          <div className="bg-slate-800/60 border border-slate-700/50 rounded-2xl p-5">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-white font-semibold text-sm">Embed Snippet</h3>
               <button onClick={copyEmbed}
