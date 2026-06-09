@@ -10,22 +10,78 @@ import WitnessPrep from './pages/WitnessPrep';
 import LegalResearch from './pages/LegalResearch';
 import DeadlineTracker from './pages/DeadlineTracker';
 import JurySim from './pages/JurySim';
-import { Scale, FolderOpen, UserPlus, FileSearch, Microscope, Swords, Users, BookOpen, Clock, Menu, BarChart2 } from 'lucide-react';
+import DocScanner from './pages/DocScanner';
+import JurisdictionEngine from './pages/JurisdictionEngine';
+import ConflictChecker from './pages/ConflictChecker';
+import EFiling from './pages/EFiling';
+import LegalSecretary from './pages/LegalSecretary';
+import Marketplace from './pages/Marketplace';
+import ContractReview from './pages/ContractReview';
+import ProductTour from './pages/ProductTour';
+import SeoPages from './pages/SeoPages';
+import SolCalculator from './pages/SolCalculator';
+import PwaInstall from './components/PwaInstall';
+import { Scale, FolderOpen, UserPlus, FileSearch, Microscope, Swords, Users, BookOpen, Clock, Menu, BarChart2, ScanLine, Globe, Shield, Gavel, MessageSquare, Store, FileCheck, PlayCircle, Globe2, Calculator, ChevronDown, ChevronRight } from 'lucide-react';
 
-const NAV = [
-  { to: '/', label: 'Dashboard', icon: Scale },
-  { to: '/cases', label: 'Cases', icon: FolderOpen },
-  { to: '/intake', label: 'AI Intake', icon: UserPlus },
-  { to: '/documents', label: 'Doc Analysis', icon: FileSearch },
-  { to: '/discovery', label: 'Discovery Miner', icon: Microscope },
-  { to: '/witnesses', label: 'Witness Prep', icon: Users },
-  { to: '/research', label: 'Legal Research', icon: BookOpen },
-  { to: '/trial', label: 'Trial Coach', icon: Swords },
-  { to: '/jury', label: 'Jury Simulator', icon: BarChart2 },
-  { to: '/deadlines', label: 'Deadlines', icon: Clock },
+interface NavSection {
+  title: string;
+  items: { to: string; label: string; icon: any }[];
+}
+
+const NAV_SECTIONS: NavSection[] = [
+  {
+    title: 'Core',
+    items: [
+      { to: '/', label: 'Dashboard', icon: Scale },
+      { to: '/cases', label: 'Cases', icon: FolderOpen },
+      { to: '/intake', label: 'AI Intake', icon: UserPlus },
+      { to: '/deadlines', label: 'Deadlines', icon: Clock },
+    ],
+  },
+  {
+    title: 'Analysis',
+    items: [
+      { to: '/documents', label: 'Doc Analysis', icon: FileSearch },
+      { to: '/doc-scanner', label: 'Doc Scanner & OCR', icon: ScanLine },
+      { to: '/contract-review', label: 'Contract Review AI', icon: FileCheck },
+      { to: '/discovery', label: 'Discovery Miner', icon: Microscope },
+    ],
+  },
+  {
+    title: 'Research & Rules',
+    items: [
+      { to: '/research', label: 'Legal Research', icon: BookOpen },
+      { to: '/jurisdiction', label: 'Jurisdiction Engine', icon: Globe },
+      { to: '/conflict-checker', label: 'Conflict Checker', icon: Shield },
+      { to: '/e-filing', label: 'E-Filing & Records', icon: Gavel },
+      { to: '/sol-calculator', label: 'SOL Calculator', icon: Calculator },
+    ],
+  },
+  {
+    title: 'Trial Prep',
+    items: [
+      { to: '/witnesses', label: 'Witness Prep', icon: Users },
+      { to: '/trial', label: 'Trial Coach', icon: Swords },
+      { to: '/jury', label: 'Jury Simulator', icon: BarChart2 },
+    ],
+  },
+  {
+    title: 'Growth & Sales',
+    items: [
+      { to: '/legal-secretary', label: 'AI Legal Secretary', icon: MessageSquare },
+      { to: '/marketplace', label: 'Marketplace', icon: Store },
+      { to: '/seo-pages', label: 'SEO Page Generator', icon: Globe2 },
+      { to: '/video-tour', label: 'Product Tour', icon: PlayCircle },
+    ],
+  },
 ];
 
 function Sidebar({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void }) {
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+
+  const toggleSection = (title: string) =>
+    setCollapsed(prev => ({ ...prev, [title]: !prev[title] }));
+
   return (
     <>
       {open && <div className="fixed inset-0 bg-black/50 z-20 md:hidden" onClick={() => setOpen(false)} />}
@@ -36,20 +92,35 @@ function Sidebar({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => vo
           </div>
           <div>
             <div className="font-bold text-white text-base leading-tight">CaseBuddy AI</div>
-            <div className="text-xs text-slate-400">Trial Prep Platform</div>
+            <div className="text-xs text-slate-400">Legal Intelligence Platform</div>
           </div>
         </div>
-        <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-          {NAV.map(({ to, label, icon: Icon }) => (
-            <NavLink key={to} to={to} end={to === '/'}
-              className={({ isActive }) =>
-                `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors
-                ${isActive ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`
-              }
-              onClick={() => setOpen(false)}>
-              <Icon size={17} />
-              {label}
-            </NavLink>
+        <nav className="flex-1 p-3 space-y-1 overflow-y-auto scrollbar-thin">
+          {NAV_SECTIONS.map(section => (
+            <div key={section.title}>
+              <button
+                onClick={() => toggleSection(section.title)}
+                className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-300"
+              >
+                {section.title}
+                {collapsed[section.title] ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
+              </button>
+              {!collapsed[section.title] && (
+                <div className="space-y-0.5 mb-2">
+                  {section.items.map(({ to, label, icon: Icon }) => (
+                    <NavLink key={to} to={to} end={to === '/'}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
+                        ${isActive ? 'bg-blue-600 text-white' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`
+                      }
+                      onClick={() => setOpen(false)}>
+                      <Icon size={16} />
+                      {label}
+                    </NavLink>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </nav>
         <div className="px-4 py-4 border-t border-slate-700/60">
@@ -88,9 +159,23 @@ export default function App() {
               <Route path="/trial" element={<TrialCoach />} />
               <Route path="/jury" element={<JurySim />} />
               <Route path="/deadlines" element={<DeadlineTracker />} />
+              {/* Tier 2 — Stickiness */}
+              <Route path="/doc-scanner" element={<DocScanner />} />
+              <Route path="/jurisdiction" element={<JurisdictionEngine />} />
+              <Route path="/conflict-checker" element={<ConflictChecker />} />
+              <Route path="/e-filing" element={<EFiling />} />
+              {/* Tier 3 — Growth */}
+              <Route path="/legal-secretary" element={<LegalSecretary />} />
+              <Route path="/marketplace" element={<Marketplace />} />
+              <Route path="/contract-review" element={<ContractReview />} />
+              {/* Tier 5 — Sales */}
+              <Route path="/video-tour" element={<ProductTour />} />
+              <Route path="/seo-pages" element={<SeoPages />} />
+              <Route path="/sol-calculator" element={<SolCalculator />} />
             </Routes>
           </main>
         </div>
+        <PwaInstall />
       </div>
     </BrowserRouter>
   );
