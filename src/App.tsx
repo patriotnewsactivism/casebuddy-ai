@@ -3,25 +3,19 @@ import { BrowserRouter, Routes, Route, NavLink } from 'react-router-dom';
 import Dashboard from './pages/Dashboard';
 import Cases from './pages/Cases';
 import IntakePage from './pages/IntakePage';
-import DocumentAnalysis from './pages/DocumentAnalysis';
+import DocumentLab from './pages/DocumentLab';
 import DiscoveryMiner from './pages/DiscoveryMiner';
-import TrialCoach from './pages/TrialCoach';
-import WitnessPrep from './pages/WitnessPrep';
-import LegalResearch from './pages/LegalResearch';
-import DeadlineTracker from './pages/DeadlineTracker';
-import JurySim from './pages/JurySim';
-import DocScanner from './pages/DocScanner';
-import JurisdictionEngine from './pages/JurisdictionEngine';
+import TrialCenter from './pages/TrialCenter';
+import LegalResearchHub from './pages/LegalResearchHub';
+import DeadlinesAndSol from './pages/DeadlinesAndSol';
 import ConflictChecker from './pages/ConflictChecker';
 import EFiling from './pages/EFiling';
 import LegalSecretary from './pages/LegalSecretary';
 import Marketplace from './pages/Marketplace';
-import ContractReview from './pages/ContractReview';
 import ProductTour from './pages/ProductTour';
 import SeoPages from './pages/SeoPages';
-import SolCalculator from './pages/SolCalculator';
 import PwaInstall from './components/PwaInstall';
-import { Scale, FolderOpen, UserPlus, FileSearch, Microscope, Swords, Users, BookOpen, Clock, Menu, BarChart2, ScanLine, Globe, Shield, Gavel, MessageSquare, Store, FileCheck, PlayCircle, Globe2, Calculator, ChevronDown, ChevronRight } from 'lucide-react';
+import { Scale, FolderOpen, UserPlus, FileSearch, Microscope, Swords, BookOpen, Clock, Menu, Shield, Gavel, MessageSquare, Store, PlayCircle, Globe2, ChevronDown, ChevronRight } from 'lucide-react';
 
 interface NavSection {
   title: string;
@@ -35,34 +29,28 @@ const NAV_SECTIONS: NavSection[] = [
       { to: '/', label: 'Dashboard', icon: Scale },
       { to: '/cases', label: 'Cases', icon: FolderOpen },
       { to: '/intake', label: 'AI Intake', icon: UserPlus },
-      { to: '/deadlines', label: 'Deadlines', icon: Clock },
+      { to: '/deadlines', label: 'Deadlines & SOL', icon: Clock },
     ],
   },
   {
-    title: 'Analysis',
+    title: 'Documents',
     items: [
-      { to: '/documents', label: 'Doc Analysis', icon: FileSearch },
-      { to: '/doc-scanner', label: 'Doc Scanner & OCR', icon: ScanLine },
-      { to: '/contract-review', label: 'Contract Review AI', icon: FileCheck },
+      { to: '/documents', label: 'Document Lab', icon: FileSearch },
       { to: '/discovery', label: 'Discovery Miner', icon: Microscope },
     ],
   },
   {
-    title: 'Research & Rules',
+    title: 'Research',
     items: [
-      { to: '/research', label: 'Legal Research', icon: BookOpen },
-      { to: '/jurisdiction', label: 'Jurisdiction Engine', icon: Globe },
+      { to: '/research', label: 'Legal Research Hub', icon: BookOpen },
       { to: '/conflict-checker', label: 'Conflict Checker', icon: Shield },
       { to: '/e-filing', label: 'E-Filing & Records', icon: Gavel },
-      { to: '/sol-calculator', label: 'SOL Calculator', icon: Calculator },
     ],
   },
   {
     title: 'Trial Prep',
     items: [
-      { to: '/witnesses', label: 'Witness Prep', icon: Users },
-      { to: '/trial', label: 'Trial Coach', icon: Swords },
-      { to: '/jury', label: 'Jury Simulator', icon: BarChart2 },
+      { to: '/trial', label: 'Trial Command Center', icon: Swords },
     ],
   },
   {
@@ -78,9 +66,7 @@ const NAV_SECTIONS: NavSection[] = [
 
 function Sidebar({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => void }) {
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
-
-  const toggleSection = (title: string) =>
-    setCollapsed(prev => ({ ...prev, [title]: !prev[title] }));
+  const toggleSection = (title: string) => setCollapsed(prev => ({ ...prev, [title]: !prev[title] }));
 
   return (
     <>
@@ -98,10 +84,8 @@ function Sidebar({ open, setOpen }: { open: boolean; setOpen: (v: boolean) => vo
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto scrollbar-thin">
           {NAV_SECTIONS.map(section => (
             <div key={section.title}>
-              <button
-                onClick={() => toggleSection(section.title)}
-                className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-300"
-              >
+              <button onClick={() => toggleSection(section.title)}
+                className="flex items-center justify-between w-full px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-slate-500 hover:text-slate-300">
                 {section.title}
                 {collapsed[section.title] ? <ChevronRight size={12} /> : <ChevronDown size={12} />}
               </button>
@@ -152,26 +136,21 @@ export default function App() {
               <Route path="/" element={<Dashboard />} />
               <Route path="/cases" element={<Cases />} />
               <Route path="/intake" element={<IntakePage />} />
-              <Route path="/documents" element={<DocumentAnalysis />} />
+              <Route path="/deadlines" element={<DeadlinesAndSol />} />
+              {/* Documents */}
+              <Route path="/documents" element={<DocumentLab />} />
               <Route path="/discovery" element={<DiscoveryMiner />} />
-              <Route path="/witnesses" element={<WitnessPrep />} />
-              <Route path="/research" element={<LegalResearch />} />
-              <Route path="/trial" element={<TrialCoach />} />
-              <Route path="/jury" element={<JurySim />} />
-              <Route path="/deadlines" element={<DeadlineTracker />} />
-              {/* Tier 2 — Stickiness */}
-              <Route path="/doc-scanner" element={<DocScanner />} />
-              <Route path="/jurisdiction" element={<JurisdictionEngine />} />
+              {/* Research */}
+              <Route path="/research" element={<LegalResearchHub />} />
               <Route path="/conflict-checker" element={<ConflictChecker />} />
               <Route path="/e-filing" element={<EFiling />} />
-              {/* Tier 3 — Growth */}
+              {/* Trial Prep */}
+              <Route path="/trial" element={<TrialCenter />} />
+              {/* Growth & Sales */}
               <Route path="/legal-secretary" element={<LegalSecretary />} />
               <Route path="/marketplace" element={<Marketplace />} />
-              <Route path="/contract-review" element={<ContractReview />} />
-              {/* Tier 5 — Sales */}
-              <Route path="/video-tour" element={<ProductTour />} />
               <Route path="/seo-pages" element={<SeoPages />} />
-              <Route path="/sol-calculator" element={<SolCalculator />} />
+              <Route path="/video-tour" element={<ProductTour />} />
             </Routes>
           </main>
         </div>
