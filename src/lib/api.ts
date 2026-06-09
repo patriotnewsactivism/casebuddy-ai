@@ -1,4 +1,5 @@
-const BASE_URL = process.env.REACT_APP_BASE44_API_URL || 'https://superagent-344f8b2b.base44.app';
+// API base — set REACT_APP_API_URL in Vercel env vars to point to your Railway backend
+const BASE_URL = (process.env.REACT_APP_API_URL || '').replace(/\/+$/, '');
 
 // Simple in-memory request deduplication
 const pendingRequests = new Map<string, Promise<any>>();
@@ -7,7 +8,6 @@ async function callFunction(name: string, payload: any, retries = 1): Promise<an
   const token = localStorage.getItem('cb_token') || '';
   const cacheKey = `${name}:${JSON.stringify(payload)}`;
 
-  // Deduplicate identical in-flight requests
   if (pendingRequests.has(cacheKey)) {
     return pendingRequests.get(cacheKey)!;
   }
@@ -15,7 +15,11 @@ async function callFunction(name: string, payload: any, retries = 1): Promise<an
   const request = (async () => {
     for (let attempt = 0; attempt <= retries; attempt++) {
       try {
-        const res = await fetch(`${BASE_URL}/functions/${name}`, {
+        const endpoint = BASE_URL
+          ? `${BASE_URL}/api/${name}`
+          : `/api/${name}`;
+
+        const res = await fetch(endpoint, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -26,7 +30,6 @@ async function callFunction(name: string, payload: any, retries = 1): Promise<an
 
         if (!res.ok) {
           if (res.status === 429 && attempt < retries) {
-            // Rate limited — wait and retry
             await new Promise(r => setTimeout(r, 1500 * (attempt + 1)));
             continue;
           }
@@ -57,3 +60,6 @@ export const analyzeDocument = (payload: any) => callFunction('analyzeDocument',
 export const aiParalegal    = (payload: any) => callFunction('aiParalegal', payload, 0);
 export const discoveryMiner = (payload: any) => callFunction('discoveryMiner', payload);
 export const trialCoach     = (payload: any) => callFunction('trialCoach', payload, 0);
+export const legalResearch  = (payload: any) => callFunction('legalResearch', payload, 0);
+export const conflictCheck  = (payload: any) => callFunction('conflictCheck', payload, 0);
+export const foiaRequest    = (payload: any) => callFunction('foiaRequest', payload, 0);
