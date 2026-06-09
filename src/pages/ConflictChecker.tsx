@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Shield, Search, AlertTriangle, CheckCircle, Plus, X, Loader2, Users, FileText, Download } from 'lucide-react';
+import { Shield, Search, AlertTriangle, CheckCircle, Plus, X, Loader2, Download } from 'lucide-react';
 import { analyzeDocument } from '../lib/api';
 
 interface Party { id: string; name: string; role: string; aliases: string; }
