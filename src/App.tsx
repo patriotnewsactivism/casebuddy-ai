@@ -15,6 +15,7 @@ import LegalSecretary from './pages/LegalSecretary';
 import Marketplace from './pages/Marketplace';
 import ProductTour from './pages/ProductTour';
 import SeoPages from './pages/SeoPages';
+import SettlementCalculator from './pages/SettlementCalculator';
 import FoiaEngine from './pages/FoiaEngine';
 import DocketMonitor from './pages/DocketMonitor';
 import VideoEvidencePipeline from './pages/VideoEvidencePipeline';
@@ -23,7 +24,7 @@ import {
   Scale, FolderOpen, UserPlus, FileSearch, Microscope, Swords,
   BookOpen, Clock, Menu, Shield, Gavel, MessageSquare, Store,
   PlayCircle, Globe2, ChevronDown, ChevronRight, X, Sparkles,
-  Bell, Video, Search
+  Bell, Search, Calculator, Film
 } from 'lucide-react';
 
 interface NavSection {
@@ -65,9 +66,10 @@ const NAV_SECTIONS: NavSection[] = [
   {
     title: 'Game Changers',
     items: [
+      { to: '/settlement', label: 'Settlement Calculator', icon: Calculator, badge: 'NEW' },
       { to: '/foia', label: 'FOIA Engine', icon: Search, badge: 'AI' },
       { to: '/docket-monitor', label: 'Docket Monitor', icon: Bell },
-      { to: '/youtube-evidence', label: 'YouTube Evidence', icon: Video, badge: 'AI' },
+      { to: '/youtube-evidence', label: 'YouTube Evidence', icon: Film, badge: 'AI' },
     ],
   },
   {
@@ -97,6 +99,7 @@ const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   '/marketplace': { title: 'Marketplace', subtitle: 'Templates, motions & strategy guides' },
   '/seo-pages': { title: 'SEO Page Generator', subtitle: 'AI-generated practice area pages' },
   '/video-tour': { title: 'Product Tour', subtitle: 'See everything CaseBuddy can do' },
+  '/settlement': { title: 'Settlement Calculator', subtitle: '§1983 case valuation with real comparable verdicts' },
   '/foia': { title: 'FOIA Engine', subtitle: 'Generate, track & appeal public records requests' },
   '/docket-monitor': { title: 'Docket Monitor', subtitle: 'Watch your cases and similar rulings' },
   '/youtube-evidence': { title: 'YouTube Evidence', subtitle: 'Index video evidence with AI analysis' },
@@ -247,6 +250,7 @@ export default function App() {
                 <Route path="/marketplace" element={<Marketplace />} />
                 <Route path="/seo-pages" element={<SeoPages />} />
                 <Route path="/video-tour" element={<ProductTour />} />
+                <Route path="/settlement" element={<SettlementCalculator />} />
                 <Route path="/foia" element={<FoiaEngine />} />
                 <Route path="/docket-monitor" element={<DocketMonitor />} />
                 <Route path="/youtube-evidence" element={<VideoEvidencePipeline />} />
