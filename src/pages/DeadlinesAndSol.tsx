@@ -1,5 +1,6 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Clock, Plus, Trash2, AlertTriangle, CheckCircle, Calendar, Calculator, MapPin, Scale, ArrowRight } from 'lucide-react';
+import { DeadlinesDB, Deadline as DBDeadline } from '../lib/db';
 
 type Tab = 'deadlines' | 'sol';
 
@@ -27,10 +28,11 @@ export default function DeadlinesAndSol() {
   const [tab, setTab] = useState<Tab>('deadlines');
 
   // Deadline state
-  const [deadlines, setDeadlines] = useState<Deadline[]>([
-    { id: '1', title: 'Answer to Complaint', deadline_type: 'Filing Deadline', due_date: new Date(Date.now() + 3*86400000).toISOString().split('T')[0], description: 'Must file answer within 21 days', is_critical: true, is_completed: false, case_name: 'Smith v. ABC Corp' },
-    { id: '2', title: 'Discovery Cutoff', deadline_type: 'Discovery Cutoff', due_date: new Date(Date.now() + 30*86400000).toISOString().split('T')[0], description: 'All discovery must be completed', is_critical: false, is_completed: false, case_name: 'Jones v. City' },
-  ]);
+  const [deadlines, setDeadlines] = useState<Deadline[]>([]);
+
+  useEffect(() => {
+    DeadlinesDB.list().then(data => setDeadlines(data as any)).catch(() => {});
+  }, []);
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ title: '', deadline_type: 'Filing Deadline', due_date: '', description: '', is_critical: false, case_name: '' });
 

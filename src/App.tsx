@@ -23,10 +23,12 @@ import FoiaEngine from './pages/FoiaEngine';
 import DocketMonitor from './pages/DocketMonitor';
 import VideoEvidencePipeline from './pages/VideoEvidencePipeline';
 import ClientPortal from './pages/ClientPortal';
+import Login from './pages/Login';
 import PublicIntake from './pages/PublicIntake';
 
 // Components
 import PwaInstall from './components/PwaInstall';
+import { useAuth } from './hooks/AuthProvider';
 import OnboardingFlow from './components/OnboardingFlow';
 
 import {
@@ -394,6 +396,36 @@ function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
   );
 }
 
+
+// ── Auth Guard ───────────────────────────────────────────────────────────────
+function RequireAuth({ children }: { children: React.ReactNode }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+
+  // If Supabase not configured, skip auth entirely (dev mode)
+  const supabaseConfigured = !!(
+    process.env.REACT_APP_SUPABASE_URL && process.env.REACT_APP_SUPABASE_ANON_KEY
+  );
+
+  if (!supabaseConfigured) return <>{children}</>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen" style={{ background: '#0a0f1e' }}>
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-violet-600 flex items-center justify-center animate-pulse">
+            <Scale className="text-white" size={20} />
+          </div>
+          <div className="text-slate-400 text-sm">Loading CaseBuddy...</div>
+        </div>
+      </div>
+    );
+  }
+  if (!user) {
+    return <Login />;
+  }
+  return <>{children}</>;
+}
+
 // ── App ──────────────────────────────────────────────────────────────────────
 export default function App() {
   const [showOnboarding, setShowOnboarding] = React.useState(() => !localStorage.getItem('cb_onboarded'));
@@ -406,7 +438,8 @@ export default function App() {
         <div className="flex-1 md:ml-[260px] flex flex-col min-h-screen">
           <TopBar onMenuClick={() => setSidebarOpen(true)} />
           <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-auto">
-            <div className="animate-fade-in">
+            <RequireAuth>
+              <div className="animate-fade-in">
               <Routes>
                 <Route path="/"                  element={<Dashboard />} />
                 <Route path="/war-room"          element={<WarRoom />} />
@@ -431,6 +464,7 @@ export default function App() {
                 <Route path="/public-intake"     element={<PublicIntake />} />
               </Routes>
             </div>
+            </RequireAuth>
           </main>
         </div>
         {showOnboarding && <OnboardingFlow onComplete={() => setShowOnboarding(false)} />}

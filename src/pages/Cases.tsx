@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FolderOpen, Plus, Search, Filter, Clock, AlertTriangle, FileSearch, UserPlus,
   User, Tag, MoreVertical, ChevronRight, Archive, Trash2,
   Phone, Mail, Calendar, DollarSign, FileText
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { CasesDB, Case as DBCase } from '../lib/db';
 
 type CaseStatus = 'Active' | 'Pending' | 'Closed' | 'On Hold';
 type CaseType = 'Civil Rights' | 'Personal Injury' | 'Criminal Defense' | 'Family Law' | 'Contract' | 'Employment' | 'Other';
@@ -74,7 +75,15 @@ const PRIORITY_CONFIG: Record<string, string> = {
 };
 
 export default function Cases() {
-  const [cases, setCases] = useState<Case[]>(SAMPLE_CASES);
+  const [cases, setCases] = useState<Case[]>([]);
+  const [dbLoading, setDbLoading] = useState(true);
+
+  useEffect(() => {
+    CasesDB.list().then(data => {
+      setCases(data as any);
+      setDbLoading(false);
+    }).catch(() => setDbLoading(false));
+  }, []);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState<CaseStatus | 'All'>('All');
   const [showNewCase, setShowNewCase] = useState(false);
