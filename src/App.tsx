@@ -15,16 +15,18 @@ import LegalSecretary from './pages/LegalSecretary';
 import Marketplace from './pages/Marketplace';
 import ProductTour from './pages/ProductTour';
 import SeoPages from './pages/SeoPages';
+import WarRoom from './pages/WarRoom';
 import SettlementCalculator from './pages/SettlementCalculator';
 import FoiaEngine from './pages/FoiaEngine';
 import DocketMonitor from './pages/DocketMonitor';
 import VideoEvidencePipeline from './pages/VideoEvidencePipeline';
 import PwaInstall from './components/PwaInstall';
+import OnboardingFlow from './components/OnboardingFlow';
 import {
   Scale, FolderOpen, UserPlus, FileSearch, Microscope, Swords,
   BookOpen, Clock, Menu, Shield, Gavel, MessageSquare, Store,
   PlayCircle, Globe2, ChevronDown, ChevronRight, X, Sparkles,
-  Bell, Search, Calculator, Film
+  Bell, Search, Calculator, Film, Users
 } from 'lucide-react';
 
 interface NavSection {
@@ -38,6 +40,7 @@ const NAV_SECTIONS: NavSection[] = [
     items: [
       { to: '/', label: 'Dashboard', icon: Scale },
       { to: '/cases', label: 'Cases', icon: FolderOpen },
+      { to: '/war-room', label: '⚔️ War Room', icon: Users, badge: 'NEW' },
       { to: '/intake', label: 'AI Intake', icon: UserPlus, badge: 'AI' },
       { to: '/deadlines', label: 'Deadlines & SOL', icon: Clock },
     ],
@@ -86,6 +89,7 @@ const NAV_SECTIONS: NavSection[] = [
 // Page title map for header
 const PAGE_TITLES: Record<string, { title: string; subtitle: string }> = {
   '/': { title: 'Dashboard', subtitle: 'Your legal intelligence overview' },
+  '/war-room': { title: '⚔️ AI War Room', subtitle: '9-agent orchestration — from intake to verdict' },
   '/cases': { title: 'Case Manager', subtitle: 'Track all active cases' },
   '/intake': { title: 'AI Intake', subtitle: 'Smart client intake with Alex, your AI paralegal' },
   '/deadlines': { title: 'Deadlines & SOL', subtitle: 'Never miss a critical date' },
@@ -225,6 +229,7 @@ function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
 }
 
 export default function App() {
+  const [showOnboarding, setShowOnboarding] = React.useState(() => !localStorage.getItem('cb_onboarded'));
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   return (
@@ -237,6 +242,7 @@ export default function App() {
             <div className="animate-fade-in">
               <Routes>
                 <Route path="/" element={<Dashboard />} />
+                <Route path="/war-room" element={<WarRoom />} />
                 <Route path="/cases" element={<Cases />} />
                 <Route path="/intake" element={<IntakePage />} />
                 <Route path="/deadlines" element={<DeadlinesAndSol />} />
@@ -258,6 +264,7 @@ export default function App() {
             </div>
           </main>
         </div>
+        {showOnboarding && <OnboardingFlow onComplete={() => setShowOnboarding(false)} />}
         <PwaInstall />
       </div>
     </BrowserRouter>
