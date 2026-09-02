@@ -34,10 +34,8 @@ import OnboardingFlow from './components/OnboardingFlow';
 import {
   Scale, FolderOpen, UserPlus, FileSearch, Microscope, Swords,
   BookOpen, Clock, Menu, Shield, Gavel, MessageSquare, Store,
-  PlayCircle, Globe2, ChevronDown, ChevronRight, X, Sparkles,
-  Bell, Search, Calculator, Film, Users, Building2, Briefcase,
-  Heart, Landmark, HandshakeIcon, Home, Zap, Star, BarChart2,
-  DollarSign, FlaskConical, Vote, AlertCircle
+  PlayCircle, Globe2, X, Sparkles, Bell, Search, Calculator,
+  Film, Users, Home, BarChart2
 } from 'lucide-react';
 
 // ── Department definitions ────────────────────────────────────────────────────
