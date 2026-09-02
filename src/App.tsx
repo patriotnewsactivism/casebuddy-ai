@@ -398,7 +398,6 @@ function TopBar({ onMenuClick }: { onMenuClick: () => void }) {
 // ── Auth Guard ───────────────────────────────────────────────────────────────
 function RequireAuth({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
-  const location = useLocation();
 
   // If Supabase not configured, skip auth entirely (dev mode)
   const supabaseConfigured = !!(
