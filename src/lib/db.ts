@@ -1,7 +1,3 @@
-/**
- * CaseBuddy database layer — wraps Supabase for all persistent data.
- * Falls back to localStorage when Supabase is not configured (dev mode).
- */
 import { supabase } from './supabase';
 
 const USE_SUPABASE = !!(
@@ -10,8 +6,56 @@ const USE_SUPABASE = !!(
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
+export type Role = 'firm_admin' | 'attorney' | 'paralegal' | 'client' | 'reviewer';
+
+export interface Organization {
+  id: string;
+  name: string;
+  created_at?: string;
+}
+
+export interface Membership {
+  id: string;
+  org_id: string;
+  user_id: string;
+  role: Role;
+  created_at?: string;
+}
+
+export interface Matter {
+  id: string;
+  org_id: string;
+  case_id?: string;
+  title: string;
+  status: string;
+  created_at?: string;
+}
+
+export interface Document {
+  id: string;
+  org_id: string;
+  matter_id?: string;
+  case_id?: string;
+  file_name: string;
+  storage_path: string;
+  file_hash: string;
+  uploader_id?: string;
+  created_at?: string;
+}
+
+export interface AuditLog {
+  id: string;
+  org_id: string;
+  user_id?: string;
+  action: string;
+  details?: any;
+  created_at?: string;
+}
+
 export interface Case {
   id: string;
+  org_id?: string;
+  matter_id?: string;
   user_id?: string;
   title: string;
   client: string;
@@ -92,6 +136,42 @@ function lsId() {
   return Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
+// ── Helper to get current user's org id ──────────────────────────────────────
+
+export async function getCurrentOrgId(): Promise<string | null> {
+  if (!USE_SUPABASE) return null;
+
+  const user = supabase.auth.user();
+  if (!user) return null;
+
+  const { data, error } = await supabase
+    .from('memberships')
+    .select('org_id')
+    .eq('user_id', user.id)
+    .limit(1);
+
+  if (error) {
+    console.error('[db] error getting org:', error.message);
+    return null;
+  }
+  return data?.[0]?.org_id ?? null;
+}
+
+// ── Audit log ───────────────────────────────────────────────────────────────
+
+export async function logAudit(action: string, details?: any) {
+  if (!USE_SUPABASE) return;
+
+  const org_id = await getCurrentOrgId();
+  if (!org_id) return;
+
+  const { error } = await supabase
+    .from('audit_logs')
+    .insert({ org_id, action, details });
+
+  if (error) console.error('[db] audit error:', error.message);
+}
+
 // ── Cases ────────────────────────────────────────────────────────────────────
 
 const DEFAULT_CASES: Case[] = [
@@ -149,220 +229,292 @@ const DEFAULT_CASES: Case[] = [
 export const CasesDB = {
   async list(): Promise<Case[]> {
     if (USE_SUPABASE) {
+      const org_id = await getCurrentOrgId();
+      if (!org_id) return [];
       const { data, error } = await supabase
         .from('cases')
         .select('*')
-        .order('created_at', { ascending: false });
+        .eq('org_id', org_id);
       if (error) throw error;
-      return (data || []) as Case[];
+      return data as Case[];
+    } else {
+      return lsGet('cases', DEFAULT_CASES);
     }
-    return lsGet<Case>('cases', DEFAULT_CASES);
   },
 
-  async create(c: Omit<Case, 'id' | 'created_at' | 'updated_at'>): Promise<Case> {
+  async create(c: Partial<Case>): Promise<Case> {
     if (USE_SUPABASE) {
-      const { data, error } = await supabase.from('cases').insert(c).select().single();
+      const org_id = await getCurrentOrgId();
+      if (!org_id) throw new Error('No org');
+      const { data, error } = await supabase
+        .from('cases')
+        .insert({ ...c, org_id })
+        .single();
       if (error) throw error;
+      await logAudit('case.created', { case_id: data.id });
       return data as Case;
+    } else {
+      const newCase = { ...c, id: lsId() } as Case;
+      const list = lsGet('cases', DEFAULT_CASES);
+      list.push(newCase);
+      lsSet('cases', list);
+      return newCase;
     }
-    const newCase: Case = { ...c, id: lsId(), created_at: new Date().toISOString() } as Case;
-    const all = lsGet<Case>('cases', DEFAULT_CASES);
-    lsSet('cases', [newCase, ...all]);
-    return newCase;
   },
 
   async update(id: string, updates: Partial<Case>): Promise<Case> {
     if (USE_SUPABASE) {
       const { data, error } = await supabase
-        .from('cases').update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', id).select().single();
+        .from('cases')
+        .update(updates)
+        .eq('id', id)
+        .single();
       if (error) throw error;
+      await logAudit('case.updated', { case_id: id });
       return data as Case;
+    } else {
+      const list = lsGet('cases', DEFAULT_CASES);
+      const idx = list.findIndex(c => c.id === id);
+      if (idx === -1) throw new Error('Case not found');
+      const updated = { ...list[idx], ...updates };
+      list[idx] = updated;
+      lsSet('cases', list);
+      return updated;
     }
-    const all = lsGet<Case>('cases', DEFAULT_CASES);
-    const updated = all.map(c => c.id === id ? { ...c, ...updates, updated_at: new Date().toISOString() } : c);
-    lsSet('cases', updated);
-    return updated.find(c => c.id === id) as Case;
   },
 
-  async delete(id: string): Promise<void> {
+  async remove(id: string): Promise<void> {
     if (USE_SUPABASE) {
       const { error } = await supabase.from('cases').delete().eq('id', id);
       if (error) throw error;
-      return;
+      await logAudit('case.deleted', { case_id: id });
+    } else {
+      const list = lsGet('cases', DEFAULT_CASES);
+      const filtered = list.filter(c => c.id !== id);
+      lsSet('cases', filtered);
     }
-    const all = lsGet<Case>('cases', DEFAULT_CASES);
-    lsSet('cases', all.filter(c => c.id !== id));
-  },
-
-  async get(id: string): Promise<Case | null> {
-    if (USE_SUPABASE) {
-      const { data, error } = await supabase.from('cases').select('*').eq('id', id).single();
-      if (error) return null;
-      return data as Case;
-    }
-    const all = lsGet<Case>('cases', DEFAULT_CASES);
-    return all.find(c => c.id === id) || null;
   },
 };
 
 // ── Deadlines ────────────────────────────────────────────────────────────────
 
-const DEFAULT_DEADLINES: Deadline[] = [
-  {
-    id: 'dl-demo-1',
-    case_name: 'Shumpert v. City of Oxford',
-    title: 'Discovery Cutoff',
-    deadline_type: 'Discovery',
-    due_date: new Date(Date.now() + 18 * 86400000).toISOString().split('T')[0],
-    description: 'All discovery requests must be served',
-    is_critical: true,
-    completed: false,
-  },
-  {
-    id: 'dl-demo-2',
-    case_name: 'Smith v. ABC Corp',
-    title: 'Answer to Complaint',
-    deadline_type: 'Filing Deadline',
-    due_date: new Date(Date.now() + 3 * 86400000).toISOString().split('T')[0],
-    description: 'Answer due under FRCP 12(a)',
-    is_critical: true,
-    completed: false,
-  },
-  {
-    id: 'dl-demo-3',
-    case_name: 'Jones v. City of Jackson',
-    title: 'Expert Witness Disclosure',
-    deadline_type: 'Expert Disclosure',
-    due_date: new Date(Date.now() + 45 * 86400000).toISOString().split('T')[0],
-    description: 'FRCP 26(a)(2) expert disclosures',
-    is_critical: false,
-    completed: false,
-  },
-];
-
 export const DeadlinesDB = {
   async list(): Promise<Deadline[]> {
     if (USE_SUPABASE) {
+      const org_id = await getCurrentOrgId();
+      if (!org_id) return [];
       const { data, error } = await supabase
         .from('deadlines')
         .select('*')
-        .order('due_date', { ascending: true });
+        .eq('org_id', org_id);
       if (error) throw error;
-      return (data || []) as Deadline[];
+      return data as Deadline[];
+    } else {
+      return lsGet('deadlines', [] as Deadline[]);
     }
-    return lsGet<Deadline>('deadlines', DEFAULT_DEADLINES);
   },
 
-  async create(d: Omit<Deadline, 'id' | 'created_at'>): Promise<Deadline> {
+  async create(d: Partial<Deadline>): Promise<Deadline> {
     if (USE_SUPABASE) {
-      const { data, error } = await supabase.from('deadlines').insert(d).select().single();
+      const org_id = await getCurrentOrgId();
+      if (!org_id) throw new Error('No org');
+      const { data, error } = await supabase
+        .from('deadlines')
+        .insert({ ...d, org_id })
+        .single();
       if (error) throw error;
+      await logAudit('deadline.created', { deadline_id: data.id });
       return data as Deadline;
+    } else {
+      const newD = { ...d, id: lsId() } as Deadline;
+      const list = lsGet('deadlines', [] as Deadline[]);
+      list.push(newD);
+      lsSet('deadlines', list);
+      return newD;
     }
-    const newD: Deadline = { ...d, id: lsId(), created_at: new Date().toISOString() } as Deadline;
-    const all = lsGet<Deadline>('deadlines', DEFAULT_DEADLINES);
-    lsSet('deadlines', [...all, newD]);
-    return newD;
   },
 
   async update(id: string, updates: Partial<Deadline>): Promise<Deadline> {
     if (USE_SUPABASE) {
-      const { data, error } = await supabase.from('deadlines').update(updates).eq('id', id).select().single();
+      const { data, error } = await supabase
+        .from('deadlines')
+        .update(updates)
+        .eq('id', id)
+        .single();
       if (error) throw error;
+      await logAudit('deadline.updated', { deadline_id: id });
       return data as Deadline;
+    } else {
+      const list = lsGet('deadlines', [] as Deadline[]);
+      const idx = list.findIndex(d => d.id === id);
+      if (idx === -1) throw new Error('Deadline not found');
+      const updated = { ...list[idx], ...updates };
+      list[idx] = updated;
+      lsSet('deadlines', list);
+      return updated;
     }
-    const all = lsGet<Deadline>('deadlines', DEFAULT_DEADLINES);
-    const updated = all.map(d => d.id === id ? { ...d, ...updates } : d);
-    lsSet('deadlines', updated);
-    return updated.find(d => d.id === id) as Deadline;
   },
 
-  async delete(id: string): Promise<void> {
+  async remove(id: string): Promise<void> {
     if (USE_SUPABASE) {
       const { error } = await supabase.from('deadlines').delete().eq('id', id);
       if (error) throw error;
-      return;
+      await logAudit('deadline.deleted', { deadline_id: id });
+    } else {
+      const list = lsGet('deadlines', [] as Deadline[]);
+      lsSet('deadlines', list.filter(d => d.id !== id));
     }
-    const all = lsGet<Deadline>('deadlines', DEFAULT_DEADLINES);
-    lsSet('deadlines', all.filter(d => d.id !== id));
   },
 };
 
-// ── War Room Sessions ─────────────────────────────────────────────────────────
+// ── War Room Sessions ───────────────────────────────────────────────────────
 
-export const WarRoomDB = {
+export const WarRoomSessionsDB = {
   async list(): Promise<WarRoomSession[]> {
     if (USE_SUPABASE) {
+      const org_id = await getCurrentOrgId();
+      if (!org_id) return [];
       const { data, error } = await supabase
         .from('war_room_sessions')
         .select('*')
-        .order('updated_at', { ascending: false });
-      if (error) return [];
-      return (data || []) as WarRoomSession[];
+        .eq('org_id', org_id);
+      if (error) throw error;
+      return data as WarRoomSession[];
+    } else {
+      return lsGet('war_room_sessions', [] as WarRoomSession[]);
     }
-    return lsGet<WarRoomSession>('war_room_sessions', []);
   },
 
-  async save(session: Omit<WarRoomSession, 'id' | 'created_at' | 'updated_at'>): Promise<WarRoomSession> {
-    const now = new Date().toISOString();
+  async create(s: Partial<WarRoomSession>): Promise<WarRoomSession> {
+    if (USE_SUPABASE) {
+      const org_id = await getCurrentOrgId();
+      if (!org_id) throw new Error('No org');
+      const { data, error } = await supabase
+        .from('war_room_sessions')
+        .insert({ ...s, org_id })
+        .single();
+      if (error) throw error;
+      await logAudit('war_room.created', { session_id: data.id });
+      return data as WarRoomSession;
+    } else {
+      const newS = { ...s, id: lsId() } as WarRoomSession;
+      const list = lsGet('war_room_sessions', [] as WarRoomSession[]);
+      list.push(newS);
+      lsSet('war_room_sessions', list);
+      return newS;
+    }
+  },
+
+  async update(id: string, updates: Partial<WarRoomSession>): Promise<WarRoomSession> {
     if (USE_SUPABASE) {
       const { data, error } = await supabase
         .from('war_room_sessions')
-        .insert({ ...session, created_at: now, updated_at: now })
-        .select().single();
+        .update(updates)
+        .eq('id', id)
+        .single();
       if (error) throw error;
+      await logAudit('war_room.updated', { session_id: id });
       return data as WarRoomSession;
+    } else {
+      const list = lsGet('war_room_sessions', [] as WarRoomSession[]);
+      const idx = list.findIndex(s => s.id === id);
+      if (idx === -1) throw new Error('Session not found');
+      const updated = { ...list[idx], ...updates };
+      list[idx] = updated;
+      lsSet('war_room_sessions', list);
+      return updated;
     }
-    const newS: WarRoomSession = { ...session, id: lsId(), created_at: now, updated_at: now } as WarRoomSession;
-    const all = lsGet<WarRoomSession>('war_room_sessions', []);
-    lsSet('war_room_sessions', [newS, ...all.slice(0, 49)]);
-    return newS;
   },
 
-  async update(id: string, updates: Partial<WarRoomSession>): Promise<void> {
+  async remove(id: string): Promise<void> {
     if (USE_SUPABASE) {
-      await supabase.from('war_room_sessions').update({ ...updates, updated_at: new Date().toISOString() }).eq('id', id);
-      return;
+      const { error } = await supabase.from('war_room_sessions').delete().eq('id', id);
+      if (error) throw error;
+      await logAudit('war_room.deleted', { session_id: id });
+    } else {
+      const list = lsGet('war_room_sessions', [] as WarRoomSession[]);
+      lsSet('war_room_sessions', list.filter(s => s.id !== id));
     }
-    const all = lsGet<WarRoomSession>('war_room_sessions', []);
-    lsSet('war_room_sessions', all.map(s => s.id === id ? { ...s, ...updates, updated_at: new Date().toISOString() } : s));
   },
 };
 
-// ── Intake Submissions ────────────────────────────────────────────────────────
+// ── Intake ───────────────────────────────────────────────────────────────────
 
-export const IntakeDB = {
+export const IntakeSubmissionsDB = {
   async list(): Promise<IntakeSubmission[]> {
     if (USE_SUPABASE) {
+      const org_id = await getCurrentOrgId();
+      if (!org_id) return [];
       const { data, error } = await supabase
         .from('intake_submissions')
         .select('*')
-        .order('created_at', { ascending: false });
-      if (error) return [];
-      return (data || []) as IntakeSubmission[];
-    }
-    return lsGet<IntakeSubmission>('intakes', []);
-  },
-
-  async create(sub: Omit<IntakeSubmission, 'id' | 'created_at'>): Promise<IntakeSubmission> {
-    if (USE_SUPABASE) {
-      const { data, error } = await supabase.from('intake_submissions').insert(sub).select().single();
+        .eq('org_id', org_id);
       if (error) throw error;
-      return data as IntakeSubmission;
+      return data as IntakeSubmission[];
+    } else {
+      return lsGet('intake_submissions', [] as IntakeSubmission[]);
     }
-    const newS: IntakeSubmission = { ...sub, id: lsId(), created_at: new Date().toISOString() } as IntakeSubmission;
-    const all = lsGet<IntakeSubmission>('intakes', []);
-    lsSet('intakes', [newS, ...all]);
-    return newS;
   },
 
-  async updateStatus(id: string, status: string, ai_analysis?: any): Promise<void> {
+  async create(s: Partial<IntakeSubmission>): Promise<IntakeSubmission> {
     if (USE_SUPABASE) {
-      await supabase.from('intake_submissions').update({ status, ...(ai_analysis ? { ai_analysis } : {}) }).eq('id', id);
-      return;
+      const org_id = await getCurrentOrgId();
+      if (!org_id) throw new Error('No org');
+      const { data, error } = await supabase
+        .from('intake_submissions')
+        .insert({ ...s, org_id })
+        .single();
+      if (error) throw error;
+      await logAudit('intake.created', { submission_id: data.id });
+      return data as IntakeSubmission;
+    } else {
+      const newS = { ...s, id: lsId() } as IntakeSubmission;
+      const list = lsGet('intake_submissions', [] as IntakeSubmission[]);
+      list.push(newS);
+      lsSet('intake_submissions', list);
+      return newS;
     }
-    const all = lsGet<IntakeSubmission>('intakes', []);
-    lsSet('intakes', all.map(s => s.id === id ? { ...s, status, ...(ai_analysis ? { ai_analysis } : {}) } : s));
+  },
+};
+
+// ── Documents (for discovery uploads) ────────────────────────────────────────
+
+export const DocumentsDB = {
+  async list(matterId?: string): Promise<Document[]> {
+    if (USE_SUPABASE) {
+      const org_id = await getCurrentOrgId();
+      if (!org_id) return [];
+      let query = supabase
+        .from('documents')
+        .select('*')
+        .eq('org_id', org_id);
+      if (matterId) query = query.eq('matter_id', matterId);
+      const { data, error } = await query;
+      if (error) throw error;
+      return data as Document[];
+    } else {
+      const all = lsGet('documents', [] as Document[]);
+      return matterId ? all.filter(d => d.matter_id === matterId) : all;
+    }
+  },
+
+  async create(d: Partial<Document>): Promise<Document> {
+    if (USE_SUPABASE) {
+      const org_id = await getCurrentOrgId();
+      if (!org_id) throw new Error('No org');
+      const { data, error } = await supabase
+        .from('documents')
+        .insert({ ...d, org_id })
+        .single();
+      if (error) throw error;
+      await logAudit('document.uploaded', { document_id: data.id });
+      return data as Document;
+    } else {
+      const newD = { ...d, id: lsId() } as Document;
+      const list = lsGet('documents', [] as Document[]);
+      list.push(newD);
+      lsSet('documents', list);
+      return newD;
+    }
   },
 };

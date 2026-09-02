@@ -2,8 +2,21 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+// Provide a fake authenticated user so the app renders the shell.
+jest.mock('./hooks/AuthProvider', () => ({
+  useAuth: () => ({
+    user: { id: 'test-user', email: 'test@example.com' },
+    session: null,
+    loading: false,
+    signIn: jest.fn(),
+    signUp: jest.fn(),
+    signOut: jest.fn(),
+    resetPassword: jest.fn(),
+  }),
+  AuthProvider: ({ children }: any) => children,
+}));
+
+test('renders main navigation', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  expect(screen.getByText(/Command Center/i)).toBeInTheDocument();
 });
